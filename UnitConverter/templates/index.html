@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unit Converter</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 350px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Unit Converter</h2>
+
+    <!-- Category -->
+    <select id="category" onchange="updateUnits()">
+        <option value="">Select Category</option>
+        <option value="length">Length</option>
+        <option value="temperature">Temperature</option>
+        <option value="weight">Weight</option>
+    </select>
+
+    <!-- Value -->
+    <input type="number" id="value" placeholder="Enter value">
+
+    <!-- From -->
+    <select id="from"></select>
+
+    <!-- To -->
+    <select id="to"></select>
+
+    <button onclick="convert()">Convert</button>
+
+    <h3 id="result"></h3>
+</div>
+
+<script>
+    const units = {
+        length: ["km", "m", "cm", "mm", "foot", "inch"],
+        temperature: ["celsius", "fahrenheit", "kelvin"],
+        weight: ["gm", "kg", "pound"]
+    };
+
+    function updateUnits() {
+        let category = document.getElementById("category").value;
+        let from = document.getElementById("from");
+        let to = document.getElementById("to");
+
+        from.innerHTML = "";
+        to.innerHTML = "";
+
+        if (units[category]) {
+            units[category].forEach(unit => {
+                let option1 = new Option(unit, unit);
+                let option2 = new Option(unit, unit);
+                from.add(option1);
+                to.add(option2);
+            });
+        }
+    }
+
+    function convert() {
+        let value = document.getElementById("value").value;
+        let category = document.getElementById("category").value;
+        let from = document.getElementById("from").value;
+        let to = document.getElementById("to").value;
+
+        fetch('/convert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value, category, from, to })
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("result").innerText =
+                "Result: " + data.result;
+        });
+    }
+</script>
+
+</body>
+</html>
